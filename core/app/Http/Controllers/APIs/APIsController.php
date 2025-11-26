@@ -290,7 +290,7 @@ For more details check <a href='http://smartfordesign.net/smartend/documentation
                                 'id' => $SubMenuLink->id,
                                 'title' => $SubMenuLink->$title_var,
                                 'section_id' => $SubMenuLink->cat_id,
-                                'href' => $m_link
+                                'href' => $SubMenuLink->link_en
                             ];
                         }
                     }
@@ -306,15 +306,17 @@ For more details check <a href='http://smartfordesign.net/smartend/documentation
                                 'id' => $SubSection->id,
                                 'title' => $SubSection->$title_var,
                                 'section_id' => $MenuLink->cat_id,
-                                'href' => "topics/cat/" . $SubSection->id
+                                'href' =>$SubSection->link_en
                             ];
                         }
                     } elseif ($MenuLink->type == 2) {
                         // Section Link
                         $m_link = $MenuLink->webmasterSection->name;
                     } elseif ($MenuLink->type == 1) {
-                        $m_link = $MenuLink->link;
+                        $m_link = $MenuLink->link_en;
                     }
+
+                   
                     $response_details[] = [
                         'id' => $MenuLink->id,
                         'title' => $MenuLink->$title_var,
