@@ -20,6 +20,9 @@ use App\Models\TopicField;
 use App\Models\Webmail;
 use App\Models\WebmasterSection;
 use App\Models\WebmasterSetting;
+use App\Models\Ticket;
+use App\Models\TicketUser;
+use App\Models\Payment;
 use Helper;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
@@ -2358,5 +2361,83 @@ For more details check <a href='http://smartfordesign.net/smartend/documentation
         }
 
     }
+
+
+public function TicketPage(Request $request)
+{
+    // Validate request
+    $this->validate($request, [
+        'api_key' => 'required',
+        'ticket_type' => 'required|string|max:100',
+        'tickets' => 'required|array|min:1|max:5',
+        'tickets.*.name' => 'required|string|max:100',
+        'tickets.*.email' => 'required|email',
+        'tickets.*.phone' => 'required|string|max:20',
+        'tickets.*.id' => 'required|string|max:50',
+        'tickets.*.id_name' => 'required|string|max:20',
+        'tickets.*.id_number' => 'required|string|max:50',
+        'payment_type' => 'required|string|max:50',
+        'amount' => 'required|numeric',
+       
+    ]);
+
+    // Check API Key
+    if ($request->api_key != Helper::GeneralWebmasterSettings("api_key")) {
+        return response()->json([
+            'code' => '-1',
+            'msg' => 'Authentication failed'
+        ], 401);
+    }
+
+    // Save Ticket
+    $ticket = Ticket::create([
+        'ticket_type' => $request->ticket_type,
+        'refer_code'  => null, // generate a random 8-char code
+    'refer_count' => 0
+    ]);
+
+    // Save Users
+    foreach ($request->tickets as $user) {
+        TicketUser::create([
+            'ticket_id' => $ticket->id,
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'phone' => $user['phone'],
+            'user_id' => $user['id'],
+            'id_name' => $user['id_name'],
+            'id_number' => $user['id_number']
+        ]);
+    }
+
+  if ($request->hasFile('payment_image')) {
+    $filename = $request->file('payment_image')->store('payments', 'public');
+    // convert to full URL like your bg_image example
+    $payment_image_path = ($filename != "") ? url("") . "/storage/" . $filename : null;
+} else {
+    return response()->json([
+        'code' => '-2',
+        'msg' => 'Payment image is required'
+    ], 422);
+}
+
+
+    // Save Payment
+    $payment = Payment::create([
+        'ticket_id' => $ticket->id,
+        'payment_type' => $request->payment_type,
+        'amount' => $request->amount,
+        'payment_image' => $payment_image_path
+    ]);
+
+    // Response
+    return response()->json([
+        'code' => '1',
+        'msg' => 'Ticket submitted successfully',
+        'ticket' => $ticket,
+        'users' => $ticket->users,
+        'payment' => $payment
+    ], 200);
+}
+
 
 }

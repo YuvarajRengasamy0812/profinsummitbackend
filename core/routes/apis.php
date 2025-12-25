@@ -35,3 +35,4 @@ Route::post('/subscribe', 'APIsController@subscribeSubmit');
 Route::post('/comment', 'APIsController@commentSubmit');
 Route::post('/order', 'APIsController@orderSubmit');
 Route::post('/contact', 'APIsController@ContactPageSubmit');
+Route::post('/ticket-submit', 'APIsController@TicketPage');
