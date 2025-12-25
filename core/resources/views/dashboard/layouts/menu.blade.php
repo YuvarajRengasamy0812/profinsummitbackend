@@ -229,8 +229,10 @@ $mnu_title_var2 = "title_" . config('smartend.default_language');
                     @endif
                     <li class="nav-header hidden-folded m-t-sm">
                         <small class="text-muted">{{ __('backend.siteData') }}</small>
-                    </li>
 
+
+
+                     
                     <?php
                     $data_sections_arr = explode(",", Auth::user()->permissionsGroup->data_sections);
                     ?>

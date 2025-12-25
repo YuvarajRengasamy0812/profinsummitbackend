@@ -99,6 +99,14 @@ Route::post('/{webmasterId}/categories/{id}/seo', [CategoriesController::class, 
 Route::get('/{webmasterId}/categories/destroy/{id?}', [CategoriesController::class, 'destroy'])->name('categoriesDestroy');
 Route::post('/{webmasterId}/categories/updateAll', [CategoriesController::class, 'updateAll'])->name('categoriesUpdateAll');
 
+
+// couponcode
+    Route::get('/couponcode', [EventsController::class,'couponlist']);
+    Route::post('/add_coupon', [EventsController::class,'couponstore']);
+    Route::get('/get_coupon/{id}', [EventsController::class,'couponedit']);
+    Route::post('/update_coupon/{id}', [EventsController::class,'couponupdate']);
+    Route::get('/delete_coupon/{id}', [EventsController::class,'coupondelete']);
+Route::post('/check-coupon', [EventsController::class, 'checkCoupon']);
 // Topics
 Route::get('/{webmasterId}/topics', [TopicsController::class, 'index'])->name('topics');
 Route::post('/topics-list', [TopicsController::class, 'list'])->name('topicsList');
