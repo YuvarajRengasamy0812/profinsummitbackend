@@ -210,13 +210,17 @@ class EventsController extends Controller
 
 public function couponlist()
 {
+
+       $GeneralWebmasterSections = WebmasterSection::where('status', 1)
+        ->orderby('row_no', 'asc')
+        ->get();
     $coupons = Coupon::orderBy('created_at', 'desc')->get();
-    return view('dashboard.referalcode.listrefer', compact('coupons'));
+    return view('dashboard.referalcode.listrefer', compact('GeneralWebmasterSections', 'coupons'));
 }
 
 
     // Store new coupon
-public function couponstore(Request $request)
+public function couponadd(Request $request)
 {
     $request->validate([
         'coupon_name' => 'required|string|max:255',
@@ -233,38 +237,54 @@ public function couponstore(Request $request)
 
 
     // Get coupon for edit (AJAX)
-    public function couponedit($id)
-    {
-        $coupon = Coupon::findOrFail($id);
-        return response()->json($coupon);
-    }
+public function couponedit($id)
+{
+    $GeneralWebmasterSections = WebmasterSection::where('status',1)->orderby('row_no','asc')->get();
+    $coupons = Coupon::orderBy('created_at','desc')->get();
+    $EditCoupon = Coupon::findOrFail($id); // Fetch the coupon to edit
+    $EStatus = "edit"; // Flag to open modal
+    return view('dashboard.referalcode.listrefer', compact('GeneralWebmasterSections','coupons','EditCoupon','EStatus'));
+}
 
-    // Update coupon
-    public function couponupdate(Request $request, $id)
-    {
-        $request->validate([
-            'coupon_name' => 'required|string|max:255',
-            'percentage'  => 'required|integer|min:1|max:100',
-            
-            'status'      => 'required|boolean',
+
+// AJAX: update coupon
+public function couponupdate(Request $request, $id)
+{
+    // Find coupon or fail
+    $coupon = Coupon::findOrFail($id);
+
+    // Validate only the fields that can be changed
+    $request->validate([
+        'coupon_name' => 'required|string|max:255',
+        'percentage'  => 'required|integer|min:1|max:100',
+        'status'      => 'required|in:0,1',
+    ]);
+
+    try {
+        // Update only allowed fields
+        $coupon->update([
+            'coupon_name' => $request->coupon_name,
+            'percentage'  => $request->percentage,
+            'status'      => $request->status,
         ]);
 
-        $coupon = Coupon::findOrFail($id);
-        $coupon->update($request->only('coupon_name', 'percentage', 'status'));
-
-    return back()->with('completed', 'Coupon Updated successfully!');
+        return redirect()->route('couponlist')->with('success','Coupon updated successfully!');
+    } catch(\Exception $e) {
+        return back()->with('error','Failed to update coupon: '.$e->getMessage());
     }
+}
 
-    // Delete coupon
-    public function coupondelete($id)
-    {
-        $coupon = Coupon::findOrFail($id);
-        $coupon->delete();
 
-        // return response()->json(['success' => true]);
-            return back()->with('deleted', 'Coupon Deeleted successfully!');
+// Delete coupon
+public function coupondelete($id)
+{
+    $coupon = Coupon::findOrFail($id);
+    $coupon->delete();
 
-    }
+    return redirect()->route('couponlist')->with('success','Coupon deleted successfully!');
+}
+
+
     public function checkCoupon(Request $request)
     {
         $coupon = Coupon::where('coupon_code', $request->coupon_code)

@@ -101,12 +101,13 @@ Route::post('/{webmasterId}/categories/updateAll', [CategoriesController::class,
 
 
 // couponcode
-    Route::get('/couponcode', [EventsController::class,'couponlist']);
-    Route::post('/add_coupon', [EventsController::class,'couponstore']);
-    Route::get('/get_coupon/{id}', [EventsController::class,'couponedit']);
-    Route::post('/update_coupon/{id}', [EventsController::class,'couponupdate']);
-    Route::get('/delete_coupon/{id}', [EventsController::class,'coupondelete']);
-Route::post('/check-coupon', [EventsController::class, 'checkCoupon']);
+Route::get('/couponlist', [EventsController::class,'couponlist'])->name('couponlist');
+Route::post('/couponadd', [EventsController::class,'couponadd'])->name('couponadd');
+Route::get('/couponedit/{id}', [EventsController::class,'couponedit'])->name('couponedit');
+Route::post('/couponupdate/{id}', [EventsController::class,'couponupdate'])->name('couponupdate');
+Route::delete('/coupondelete/{id}', [EventsController::class,'coupondelete'])->name('coupondelete');
+Route::post('/checkCoupon', [EventsController::class, 'checkCoupon'])->name('checkCoupon');
+
 // Topics
 Route::get('/{webmasterId}/topics', [TopicsController::class, 'index'])->name('topics');
 Route::post('/topics-list', [TopicsController::class, 'list'])->name('topicsList');
