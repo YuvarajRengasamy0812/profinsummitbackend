@@ -275,6 +275,8 @@
                                         data-target="#deleteCoupon{{ $coupon->coupon_id }}">
                                         <span class="material-icons">delete</span>
                                     </button>
+                                     
+
 
                                     <!-- Delete Modal -->
                                     <div id="deleteCoupon{{ $coupon->coupon_id }}" class="modal fade" data-backdrop="true">
@@ -423,7 +425,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button  class="btn btn-primary">Update</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
                 </form>
             </div>
@@ -521,6 +523,4 @@
             filterTable();
         });
     </script>
-
-
 @endsection
