@@ -391,6 +391,7 @@
                         <span class="material-icons">close</span>
                     </button>
                 </div>
+                 <form method="POST" id="editForm" >
                 @csrf
                 <div class="modal-body">
 
@@ -422,7 +423,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button  class="btn btn-primary">Update</button>
                 </div>
                 </form>
             </div>
