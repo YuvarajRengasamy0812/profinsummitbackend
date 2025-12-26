@@ -22,10 +22,12 @@ use App\Models\WebmasterSection;
 use App\Models\WebmasterSetting;
 use App\Models\Ticket;
 use App\Models\TicketUser;
+use App\Models\UserRegister;
 use App\Models\Payment;
 use Helper;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Hash;
 use Mail;
 
 class APIsController extends Controller
@@ -2392,8 +2394,8 @@ public function TicketPage(Request $request)
     // Save Ticket
     $ticket = Ticket::create([
         'ticket_type' => $request->ticket_type,
-        'refer_code'  => null, // generate a random 8-char code
-    'refer_count' => 0
+        'refer_code'  =>$request->refer_code, // generate a random 8-char code
+    'refer_count' => $request->refer_count
     ]);
 
     // Save Users
@@ -2439,5 +2441,101 @@ public function TicketPage(Request $request)
     ], 200);
 }
 
+public function registerSubmit(Request $request)
+{
+    // ✅ Validation (same style as subscribe)
+    $this->validate($request, [
+        'api_key' => 'required',
+        'full_name' => 'required',
+        'email' => 'required',
+        'company_name' => 'required',
+        'phone' => 'required',
+        'user_type' => 'required',
+        'nationality' => 'required',
+        'password' => 'required|min:6',
+        'password_confirmation' => 'required|same:password'
+    ]);
+
+    // 🔐 API KEY CHECK (BODY la irundhu)
+    if ($request->api_key == Helper::GeneralWebmasterSettings("api_key")) {
+
+        // ✅ Save user
+        $user = new UserRegister();
+        $user->full_name = $request->full_name;
+        $user->email = $request->email;
+        $user->company_name = $request->company_name;
+        $user->phone = $request->phone;
+        $user->user_type = $request->user_type;
+        $user->nationality = $request->nationality;
+        $user->password = \Hash::make($request->password);
+        $user->special_requirements = $request->special_requirements;
+        $user->sponsor_package = $request->sponsor_package;
+        $user->products_services = $request->products_services;
+        $user->save();
+
+        // ✅ Response
+        return response()->json([
+            'code' => '1',
+            'msg' => 'Registration successful'
+        ], 201);
+
+    } else {
+        // ❌ API KEY FAILED
+        return response()->json([
+            'code' => '-1',
+            'msg' => 'Authentication failed'
+        ], 500);
+    }
+}
+
+ public function loginSubmit(Request $request)
+    {
+        // ✅ Validation
+        $this->validate($request, [
+            'api_key' => 'required',
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        // 🔐 API KEY CHECK (BODY)
+        if ($request->api_key == Helper::GeneralWebmasterSettings("api_key")) {
+
+            // ✅ Check user
+            $user = UserRegister::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'code' => '0',
+                    'msg' => 'User not found'
+                ], 404);
+            }
+
+            // ✅ Password check
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'code' => '0',
+                    'msg' => 'Invalid password'
+                ], 401);
+            }
+
+            // ✅ Login success
+            return response()->json([
+                'code' => '1',
+                'msg' => 'Login successful',
+                'data' => [
+                    'id' => $user->id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'user_type' => $user->user_type
+                ]
+            ], 200);
+
+        } else {
+            return response()->json([
+                'code' => '-1',
+                'msg' => 'Authentication failed'
+            ], 500);
+        }
+    }
 
 }
