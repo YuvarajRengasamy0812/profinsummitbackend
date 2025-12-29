@@ -2441,6 +2441,57 @@ public function TicketPage(Request $request)
     ], 200);
 }
 
+
+
+public function TicketList(Request $request)
+{
+    // ✅ API key check
+    $apiKey = $request->query('api_key');
+    $correctApiKey = Helper::GeneralWebmasterSettings("api_key");
+
+    if (!$apiKey || $apiKey != $correctApiKey) {
+        return response()->json([
+            'msg' => 'Authentication failed',
+            'details' => [
+                'tickets' => [],
+                'general_webmaster_sections' => [],
+               
+            ]
+        ], 401);
+    }
+
+    // Fetch all tickets with users & payment
+    $tickets = Ticket::with(['users', 'payment'])
+        ->orderBy('id', 'asc') // or 'id' if row_no does not exist
+        ->get();
+
+    // Fetch General Webmaster Sections
+    $generalWebmasterSections = WebmasterSection::where('status', 1)
+        ->orderBy('row_no', 'asc')
+        ->get();
+
+
+ 
+
+    // Response
+    return response()->json([
+        'msg' => 'All tickets fetched successfully',
+        'details' => [
+            'tickets' => $tickets,
+            'general_webmaster_sections' => $generalWebmasterSections,
+           
+        ]
+    ], 200);
+}
+
+
+
+
+
+
+
+
+
 public function registerSubmit(Request $request)
 {
     // ✅ Validation (same style as subscribe)
@@ -2526,7 +2577,11 @@ public function registerSubmit(Request $request)
                     'id' => $user->id,
                     'full_name' => $user->full_name,
                     'email' => $user->email,
-                    'user_type' => $user->user_type
+                    'user_type' => $user->user_type,
+                    'company_name'=>$user->company_name,
+                      'phone' => $user->phone,
+                    'nationality'=>$user->nationality,
+                    'special_requirements'=>$user->special_requirements
                 ]
             ], 200);
 
@@ -2537,5 +2592,50 @@ public function registerSubmit(Request $request)
             ], 500);
         }
     }
+public function UserProfile(Request $request)
+{
+    // Validate API key
+    $this->validate($request, [
+        'api_key' => 'required',
+    ]);
+
+    if ($request->api_key != Helper::GeneralWebmasterSettings("api_key")) {
+        return response()->json([
+            'code' => '-1',
+            'msg' => 'Authentication failed'
+        ], 401);
+    }
+
+    // Use the Profinsummit guard to get logged-in user
+   $user = Auth::guard('profinsummit')->user();
+
+    if (!$user) {
+        return response()->json([
+            'code' => '-2',
+            'msg' => 'User not authenticated'
+        ], 401);
+    }
+
+    return response()->json([
+        'code' => '1',
+        'msg' => 'User profile fetched successfully',
+        'user' => [
+            'id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'company_name' => $user->company_name,
+            'phone' => $user->phone,
+            'user_type' => $user->user_type,
+            'nationality' => $user->nationality,
+            'special_requirements' => $user->special_requirements,
+            'sponsor_package' => $user->sponsor_package,
+            'products_services' => $user->products_services,
+        ]
+    ], 200);
+}
+
+
+
+
 
 }

@@ -36,5 +36,8 @@ Route::post('/comment', 'APIsController@commentSubmit');
 Route::post('/order', 'APIsController@orderSubmit');
 Route::post('/contact', 'APIsController@ContactPageSubmit');
 Route::post('/ticket-submit', 'APIsController@TicketPage');
+Route::get('/ticket', 'APIsController@TicketList');
+
 Route::post('/register', 'APIsController@registerSubmit');
 Route::post('/login', 'APIsController@loginSubmit');
+Route::get('/profile', 'APIsController@UserProfile');

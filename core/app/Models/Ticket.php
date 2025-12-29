@@ -7,24 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    use HasFactory;
+    protected $fillable = ['ticket_type', 'refer_code', 'refer_count'];
 
-    protected $table = 'tickets';
-
-    protected $fillable = [
-        'ticket_type',
-        'refer_code',
-        'refer_count'
-    ];
-
-    // Relationships
     public function users()
     {
-        return $this->hasMany(TicketUser::class, 'ticket_id', 'id');
+        return $this->hasMany(TicketUser::class, 'ticket_id');
     }
 
     public function payment()
     {
-        return $this->hasOne(Payment::class, 'ticket_id', 'id');
+        return $this->hasOne(Payment::class, 'ticket_id');
     }
 }
+

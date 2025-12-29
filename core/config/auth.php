@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'profinsummit' => [
+        'driver' => 'session', // or 'token' if API token-based auth
+        'provider' => 'user_registers',
+    ],
     ],
 
     /*
@@ -69,6 +73,10 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        'user_registers' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\UserRegister::class,
+    ],
     ],
 
     /*
